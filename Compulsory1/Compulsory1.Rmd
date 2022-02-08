@@ -1,0 +1,76 @@
+---
+subtitle: "TMA4268 Statistical Learning V2022"
+title: "Compulsory exercise 1: Group 5"
+author: "Aleksander Johnsen Solberg and Gjermund Oscar Lyckander"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  # html_document
+  pdf_document
+---
+  
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3,fig.align = "center")
+```
+
+```{r,eval=TRUE,echo=FALSE}
+#install.packages("knitr") #probably already installed
+#install.packages("rmarkdown") #probably already installed
+#install.packages("ggplot2") #plotting with ggplot
+#install.packages("palmerpenguins")
+#install.packages("ggfortify") # For model checking
+#install.packages("MASS")
+#install.packages("class")
+#install.packages("pROC")
+#install.packages("plotROC")
+#install.packages("boot")
+library("knitr")
+library("rmarkdown")
+library("palmerpenguins")
+```
+
+<!--  Etc (load all packages needed). -->
+
+
+# Problem 1
+
+## a)
+$$E[y_0 - \hat f(x_0)]^2 = E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
+= E[(f(x_0))^2] + E[\varepsilon^2] + E[\hat f(x_0)^2] -2E[f(x_0) \hat f(x_0)] + 2E[f(x_0) \varepsilon] + 2E[ \hat f(x_0) \varepsilon] \\
+= f(x_0)^2 + \text{Var}(\varepsilon) + \text{Var}(\hat f(x_0)) + E[\hat f(x_0)]^2 - 2E[f(x_0) \hat f(x_0)]\\
+= (f(x_0) - E[\hat f(x_0)])^2 + \text{Var}(\hat f(x_0))  + \text{Var}(\varepsilon) $$
+The three terms in the last line are the bias, variance, and irreducible error respectively.
+
+## b)
+
+## c)
+
+## d)
+
+## e)
+
+ 
+
+# Problem 2
+
+Here is a code chunk:
+
+```{r, eval=TRUE}
+library(palmerpenguins) # Contains the data set "penguins".
+data(penguins)
+head(penguins)
+```
+
+
+## a)
+
+## b) 
+ 
+## c)
+
+
+# Problem 3
+
+# Problem 4
+ 

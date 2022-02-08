@@ -36,13 +36,21 @@ library("palmerpenguins")
 # Problem 1
 
 ## a)
-$$E[y_0 - \hat f(x_0)]^2 = E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
-= E[(f(x_0))^2] + E[\varepsilon^2] + E[\hat f(x_0)^2] -2E[f(x_0) \hat f(x_0)] + 2E[f(x_0) \varepsilon] + 2E[ \hat f(x_0) \varepsilon] \\
-= f(x_0)^2 + \text{Var}(\varepsilon) + \text{Var}(\hat f(x_0)) + E[\hat f(x_0)]^2 - 2E[f(x_0) \hat f(x_0)]\\
-= (f(x_0) - E[\hat f(x_0)])^2 + \text{Var}(\hat f(x_0))  + \text{Var}(\varepsilon) $$
-The three terms in the last line are the bias, variance, and irreducible error respectively.
+$$
+\begin{aligned}
+  E[y_0 - \hat f(x_0)]^2 &= E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
+  &= E[(f(x_0))^2] + E[\varepsilon^2] + E[\hat f(x_0)^2] -2E[f(x_0) \hat f(x_0)] + 2E[f(x_0) \varepsilon] + 2E[ \hat f(x_0) \varepsilon] \\
+  &= f(x_0)^2 + \text{Var}(\varepsilon) + \text{Var}(\hat f(x_0)) + E[\hat f(x_0)]^2 - 2E[f(x_0) \hat f(x_0)]\\
+  &= (f(x_0) - E[\hat f(x_0)])^2 + \text{Var}(\hat f(x_0))  + \text{Var}(\varepsilon)
+\end{aligned}
+$$
+The three terms in the last line are the squared bias, variance, and irreducible error respectively.
 
 ## b)
+The three terms can be interpreted as the following.
+The bias term is the error that comes from modeling a complicated real-life problem with a simple model. The more flexible the model is, the smaller the bias will be. 
+The variance term is how much the estimate $\hat{f}$ would change if we were using different training data. The more flexible the model is, the larger the variance will be.
+Lastly, the irreducible error term is simply the error that comes from the error in the data itself.
 
 ## c)
 

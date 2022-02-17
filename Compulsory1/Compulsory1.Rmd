@@ -53,11 +53,19 @@ The variance term is how much the estimate $\hat{f}$ would change if we were usi
 Lastly, the irreducible error term is simply the error that comes from the error in the data itself.
 
 ## c)
+  (i) True
+  (ii) False
+  (iii) True
+  (iv) False
 
 ## d)
+  (i) True
+  (ii)
+  (iii) 
+  (iv) False
 
 ## e)
-
+  (i) is true
  
 
 # Problem 2
@@ -68,12 +76,20 @@ Here is a code chunk:
 library(palmerpenguins) # Contains the data set "penguins".
 data(penguins)
 head(penguins)
+Penguins <- subset(penguins, select = -c(island, year))
 ```
 
 
 ## a)
+  * Takes the covariate 'sex' out of the model despite it being very segnificant. Basil clearly has clearly misunderstood what is considered a good p-value
+  * Leaves in covariates that are clearly not significant, such as the interaction between 'bill_depth_mm' and 'species'.
+  * 
 
 ## b) 
+```{r, eval=TRUE}
+pairs(Penguins)
+```
+
  
 ## c)
 

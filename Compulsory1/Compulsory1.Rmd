@@ -83,16 +83,45 @@ Penguins <- subset(penguins, select = -c(island, year))
 ## a)
   * Takes the covariate 'sex' out of the model despite it being very segnificant. Basil clearly has clearly misunderstood what is considered a good p-value
   * Leaves in covariates that are clearly not significant, such as the interaction between 'bill_depth_mm' and 'species'.
-  * 
+  * Says that the interaction term is overall significant when only this is only true for one species.
+  * Does not include 'bill_length_mm' in the model at any point, even though we suspect it might be siginificant
+  * Concludes that chinstrap penguins have the largest bodymass, which one can clearly see from the data is not true. There must be something wrong with the model.
 
 ## b) 
 ```{r, eval=TRUE}
-pairs(Penguins)
+library(GGally)
+ggpairs(Penguins, aes(colour = species))
 ```
 
  
 ## c)
+```{r, eval=TRUE}
+penguin.model1 <- lm(body_mass_g ~ . + species*bill_depth_mm, data = Penguins)
+summary(penguin.model1)
+anova(penguin.model1)
+```
+Not quite happy with this, as the species coavriate is not as significant as one would think from seeing the pairs plot. Try without 'bill_length_mm' and the interactions.
+```{r, eval=TRUE}
+penguin.model2 <- lm(body_mass_g ~  bill_depth_mm + flipper_length_mm + sex + species, data = Penguins)
+summary(penguin.model2)
+anova(penguin.model2)
+```
+We begin with a model with bodey mass as the response, and species, bill length, bill depth, flipper length, sex and the interaction between species and bill depth as the covariates. We see that not all of these predictors are significant in the model, and so we try a reduced model using only bill length, flipper length, sex and species as the covariates. We now see that all the covariates have p-values that are very low, and so they should be included in the model. In the species covariate, we see that only the distinction between Gentoo and the other two species is helpful, and so we will reflect this in the model by only distinguishing between Gentoo and not Gentoo. The final model can thus be described as such:
+$$
+\begin{aligned}
+  \hat{y}_{female} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length}\\
+  \hat{y}_{male} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male}\\
+  \hat{y}_{female\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{gentoo}\\
+  \hat{y}_{male\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male} + \hat{\beta}_{gentoo}
+\end{aligned}
+$$
+```{r}
+library(ggfortify)
+autoplot(penguin.model2)
+```
+From the residuals vs. fitted plot, we do not see any evidence of non-linearity. and can therefore conclude that the expected value of the residuals is zero. We do however see some structure in that the points are grouped together into four groups. This might come from the fact that we have a model that is split into four given by the sex and the species, however, the significance of this structure is unknown. 
 
+In the QQ-plot, we can see the points follow the straight line very well, and we can say that the residuals are normally distributed.
 
 # Problem 3
 

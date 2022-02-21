@@ -124,6 +124,49 @@ From the residuals vs. fitted plot, we do not see any evidence of non-linearity.
 In the QQ-plot, we can see the points follow the straight line very well, and we can say that the residuals are normally distributed.
 
 # Problem 3
+```{r}
+library(tidyverse)
+library(GGally)
+# Create a new boolean variable indicating whether or not the penguin is an Adelie penguin
+Penguins$adelie <- ifelse(Penguins$species == "Adelie", 1, 0)
+# Select only relevant variables and remove all rows with missing values in 
+# body mass, flipper length, sex or species.
+Penguins_reduced <- Penguins %>% 
+  dplyr::select(body_mass_g, flipper_length_mm, adelie) %>% 
+  mutate(body_mass_g = as.numeric(body_mass_g), 
+         flipper_length_mm = as.numeric(flipper_length_mm)) %>% 
+  drop_na()
+set.seed(4268) 
+# 70% of the sample size for training set
+training_set_size <- floor(0.70 * nrow(Penguins_reduced))
+train_ind <- sample(seq_len(nrow(Penguins_reduced)), size = training_set_size)
+train <- Penguins_reduced[train_ind, ]
+test <- Penguins_reduced[-train_ind, ]
+```
+## a)
+  (i)
+```{r}
+ggpairs(Penguins_reduced)
+log.model <- glm(adelie ~ ., data = train, family = binomial)
+summary(log.model)
+```
+```{r}
+log.probabilities <- predict(log.model, newdata = test, type = 'response')
+log.predicted.classes <- ifelse(log.probabilities > 0.5, 1, 0)
+mean(log.predicted.classes == test$adelie)
+```
+  (ii)
+```{r}
+library(MASS)
+qda.model <- qda(adelie ~ ., data = train)
+summary(log.model)
+```
+```{r}
+qda.probabilities <- predict(qda.model, newdata = test, type = 'response')$posterior
+qda.predicted.classes <- predict(qda.model, newdata = test, type = 'response')$class
+mean(qda.predicted.classes == test$adelie)
+```
+  (iii)
 
 # Problem 4
  

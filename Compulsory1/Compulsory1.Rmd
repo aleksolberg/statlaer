@@ -167,6 +167,18 @@ qda.predicted.classes <- predict(qda.model, newdata = test, type = 'response')$c
 mean(qda.predicted.classes == test$adelie)
 ```
   (iii)
+```{r}
+library(class)
+knn.model <- knn(train = train, test = test, cl = train$adelie, k=25, prob = T)
+table(knn.model, test$adelie)
+mean(knn.model == test$adelie)
+```
+  (iv)
+```{r}
+table(log.predicted.classes, test$adelie)
+```
+  
 
 # Problem 4
- 
+## a)
+  (i) 

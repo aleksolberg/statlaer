@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.wh
 ```
 
 ```{r,eval=TRUE,echo=FALSE}
+#install.packages("Rtools")
 #install.packages("knitr") #probably already installed
 #install.packages("rmarkdown") #probably already installed
 #install.packages("ggplot2") #plotting with ggplot
@@ -25,26 +26,29 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.wh
 #install.packages("pROC")
 #install.packages("plotROC")
 #install.packages("boot")
+#install.packages('plyr', repos = "http://cran.us.r-project.org")
 library("knitr")
+#install.packages("tinytex")
+#tinytex::install_tinytex()
 library("rmarkdown")
 library("palmerpenguins")
 ```
 
 <!--  Etc (load all packages needed). -->
-
-
-# Problem 1
-
-## a)
-$$
-\begin{aligned}
-  E[y_0 - \hat f(x_0)]^2 &= E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
-  &= E[(f(x_0))^2] + E[\varepsilon^2] + E[\hat f(x_0)^2] -2E[f(x_0) \hat f(x_0)] + 2E[f(x_0) \varepsilon] + 2E[ \hat f(x_0) \varepsilon] \\
-  &= f(x_0)^2 + \text{Var}(\varepsilon) + \text{Var}(\hat f(x_0)) + E[\hat f(x_0)]^2 - 2E[f(x_0) \hat f(x_0)]\\
-  &= (f(x_0) - E[\hat f(x_0)])^2 + \text{Var}(\hat f(x_0))  + \text{Var}(\varepsilon)
+  
+  
+  # Problem 1
+  
+  ## a)
+  $$
+  \begin{aligned}
+E[y_0 - \hat f(x_0)]^2 &= E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
+&= E[(f(x_0))^2] + E[\varepsilon^2] + E[\hat f(x_0)^2] -2E[f(x_0) \hat f(x_0)] + 2E[f(x_0) \varepsilon] + 2E[ \hat f(x_0) \varepsilon] \\
+&= f(x_0)^2 + \text{Var}(\varepsilon) + \text{Var}(\hat f(x_0)) + E[\hat f(x_0)]^2 - 2E[f(x_0) \hat f(x_0)]\\
+&= (f(x_0) - E[\hat f(x_0)])^2 + \text{Var}(\hat f(x_0))  + \text{Var}(\varepsilon)
 \end{aligned}
 $$
-The three terms in the last line are the squared bias, variance, and irreducible error respectively.
+  The three terms in the last line are the squared bias, variance, and irreducible error respectively.
 
 ## b)
 The three terms can be interpreted as the following.
@@ -53,25 +57,25 @@ The variance term is how much the estimate $\hat{f}$ would change if we were usi
 Lastly, the irreducible error term is simply the error that comes from the error in the data itself.
 
 ## c)
-  (i) True
-  (ii) False
-  (iii) True
-  (iv) False
+(i) True
+(ii) False
+(iii) True
+(iv) False
 
 ## d)
-  (i) True
-  (ii)
-  (iii) 
-  (iv) False
+(i) True
+(ii)
+(iii) 
+(iv) False
 
 ## e)
-  (i) is true
- 
+(i) is true
+
 
 # Problem 2
 
 Here is a code chunk:
-
+  
 ```{r, eval=TRUE}
 library(palmerpenguins) # Contains the data set "penguins".
 data(penguins)
@@ -81,11 +85,11 @@ Penguins <- subset(penguins, select = -c(island, year))
 
 
 ## a)
-  * Takes the covariate 'sex' out of the model despite it being very segnificant. Basil clearly has clearly misunderstood what is considered a good p-value
-  * Leaves in covariates that are clearly not significant, such as the interaction between 'bill_depth_mm' and 'species'.
-  * Says that the interaction term is overall significant when only this is only true for one species.
-  * Does not include 'bill_length_mm' in the model at any point, even though we suspect it might be siginificant
-  * Concludes that chinstrap penguins have the largest bodymass, which one can clearly see from the data is not true. There must be something wrong with the model.
+* Takes the covariate 'sex' out of the model despite it being very segnificant. Basil clearly has clearly misunderstood what is considered a good p-value
+* Leaves in covariates that are clearly not significant, such as the interaction between 'bill_depth_mm' and 'species'.
+* Says that the interaction term is overall significant when only this is only true for one species.
+* Does not include 'bill_length_mm' in the model at any point, even though we suspect it might be siginificant
+* Concludes that chinstrap penguins have the largest bodymass, which one can clearly see from the data is not true. There must be something wrong with the model.
 
 ## b) 
 ```{r, eval=TRUE}
@@ -93,7 +97,7 @@ library(GGally)
 ggpairs(Penguins, aes(colour = species))
 ```
 
- 
+
 ## c)
 ```{r, eval=TRUE}
 penguin.model1 <- lm(body_mass_g ~ . + species*bill_depth_mm, data = Penguins)
@@ -107,12 +111,12 @@ summary(penguin.model2)
 anova(penguin.model2)
 ```
 We begin with a model with bodey mass as the response, and species, bill length, bill depth, flipper length, sex and the interaction between species and bill depth as the covariates. We see that not all of these predictors are significant in the model, and so we try a reduced model using only bill length, flipper length, sex and species as the covariates. We now see that all the covariates have p-values that are very low, and so they should be included in the model. In the species covariate, we see that only the distinction between Gentoo and the other two species is helpful, and so we will reflect this in the model by only distinguishing between Gentoo and not Gentoo. The final model can thus be described as such:
-$$
-\begin{aligned}
-  \hat{y}_{female} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length}\\
-  \hat{y}_{male} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male}\\
-  \hat{y}_{female\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{gentoo}\\
-  \hat{y}_{male\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male} + \hat{\beta}_{gentoo}
+  $$
+  \begin{aligned}
+\hat{y}_{female} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length}\\
+\hat{y}_{male} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male}\\
+\hat{y}_{female\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{gentoo}\\
+\hat{y}_{male\_gentoo} &= \hat{\beta}_0 + \hat{\beta}_{bill\_depth} x_{bill\_depth} + \hat{\beta}_{flipper\_length} x_{flipper\_length} + \hat{\beta}_{male} + \hat{\beta}_{gentoo}
 \end{aligned}
 $$
 ```{r}
@@ -175,10 +179,95 @@ mean(knn.model == test$adelie)
 ```
   (iv)
 ```{r}
-table(log.predicted.classes, test$adelie)
+library(caret)
+sensitivity(table(log.predicted.classes, test$adelie))
+specificity(table(log.predicted.classes, test$adelie))
 ```
-  
+```{r}
+sensitivity(table(qda.predicted.classes, test$adelie))
+specificity(table(qda.predicted.classes, test$adelie))
+```
+```{r}
+sensitivity(table(knn.model, test$adelie))
+specificity(table(knn.model, test$adelie))
+```
+The logistic regression model has a sensitivity of $87\%$, and a specificity of $98\%$.
+The QDA model has a sensitivity of $77\%$, and a specificity of $98\%$.
+The KNN model has a sensitivity of $58\%$, and a specificity of $95\%$.
+
+
 
 # Problem 4
+
 ## a)
-  (i) 
+(i) True
+(ii) False
+(iii) False
+(iv) False
+
+## b)
+
+```{r, eval=TRUE}
+id <- "1chRpybM5cJn4Eow3-_xwDKPKyddL9M2N" # google file ID
+d.chd <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+d.chd$sex <- as.factor(d.chd$sex)
+d.chd$smoking <- as.factor(d.chd$smoking)
+glm.fit <- glm(chd ~ sbp + sex + smoking, data = d.chd, family = "binomial")
+summary(glm.fit)$coef
+glm.predict <- predict(glm.fit, data.frame(sbp = 150, sex = as.factor(1), smoking = as.factor(0)), type = "response")
+glm.predict
+```
+
+The probability of chd for a non-smoking male with a sbp=150 is 0.101.
+
+## c)
+
+```{r, eval=TRUE}
+B <- 1000
+n <- 101
+estimate <- rep(NA, B)
+for (b in 1:B){
+  set.seed(b)
+  thisboot <- d.chd[sample(nrow(d.chd), n), ]
+  boot.fit <- glm(chd ~ sbp + sex + smoking, data = thisboot, family = "binomial")
+  boot.predict <- predict(boot.fit, data.frame(sbp = 150, sex = as.factor(1), smoking = as.factor(0)), type = "response")
+  estimate [b] <- boot.predict
+}
+
+std.err <- function(x) sd(x)/sqrt(length(x))
+estimate.stderr <- std.err(estimate)
+
+estimate.mean <- mean(estimate)
+
+alpha <- 0.05
+degrees.freedom <- length(estimate)-3
+t.score = qt(p=alpha/2, df = degrees.freedom, lower.tail = F)
+
+margin.error <- t.score*estimate.stderr
+lower.bound <- estimate.mean - margin.error
+upper.bound <- estimate.mean + margin.error
+
+
+estimate.stderr
+
+estimate.mean
+
+lower.bound
+
+upper.bound
+
+
+```
+
+The standard error is `r estimate.stderr`.
+
+The 95% quantile interval is (`r lower.bound`, `r upper.bound`).
+
+From the results of the bootstrap we see that a non-smoking male with a sbp=150 has an expected probability of coronary heart disease of `r estimate.mean`. There is a probability of 95% that the expected probability of chd for a non-smoking male with a sbp=150 lies between `r lower.bound` and `r upper.bound`.
+
+
+## d)
+(i) False
+(ii) True
+(iii)
+(iv)

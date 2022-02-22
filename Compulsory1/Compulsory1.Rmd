@@ -37,9 +37,9 @@ library("palmerpenguins")
 <!--  Etc (load all packages needed). -->
   
   
-  # Problem 1
+# Problem 1
   
-  ## a)
+## a)
   $$
   \begin{aligned}
 E[y_0 - \hat f(x_0)]^2 &= E[(f(x_0) + \varepsilon - \hat f(x_0))^2] \\ 
@@ -64,8 +64,8 @@ Lastly, the irreducible error term is simply the error that comes from the error
 
 ## d)
 (i) True
-(ii)
-(iii) 
+(ii) False
+(iii) False
 (iv) False
 
 ## e)
@@ -195,6 +195,46 @@ The logistic regression model has a sensitivity of $87\%$, and a specificity of 
 The QDA model has a sensitivity of $77\%$, and a specificity of $98\%$.
 The KNN model has a sensitivity of $58\%$, and a specificity of $95\%$.
 
+## b)
+(i)
+```{r}
+library(pROC)
+log.roc <- roc(test$adelie, log.probabilities, direction = '<', lwd=3)
+plot(log.roc)
+auc(log.roc)
+```
+```{r}
+qda.roc = roc(test$adelie, qda.probabilities[,2], direction = '<', lwd=3)
+plot(qda.roc)
+auc(qda.roc)
+```
+```{r}
+probKNN = ifelse(knn.model == 0, 1 - attributes(knn.model)$prob, attributes(knn.model)$prob)
+knn.roc <- roc(test$adelie, probKNN, direction = '<', lwd=3)
+plot(knn.roc)
+auc(knn.roc)
+```
+(ii)
+We see that the logistic regression model and the QDA model both perform very well in this instance, while the KNN model does a decent job, but far worse than the other two.
+
+(iii)
+In order to get an interpretable model, I would choose the logistic regression model, as you can easily interpret the effect each covariate has on the prediction from the coefficients the model gives.
+
+## c)
+(iii) is True
+
+## d)
+```{r}
+library(ggplot2)
+log.train.probabilities <- predict(log.model, newdata = train, type = 'response')
+log.train.predicted.classes <- ifelse(log.train.probabilities > 0.5, 1, 0)
+ggplot(test, aes(x = body_mass_g, y = flipper_length_mm, group=adelie)) +
+      geom_point(aes(colour = factor(adelie, labels = c('Not Adelie', 'Adelie')), shape = factor(log.predicted.classes, labels=c('Not Adelie', 'Adelie')))) + 
+      geom_point(data=train, aes(colour = factor(adelie, labels = c('Not Adelie', 'Adelie')), shape = factor(log.train.predicted.classes, labels=c('Not Adelie', 'Adelie')))) +
+      labs(color = 'True species', shape = 'Predicted') +
+      theme_bw()
+  
+```
 
 
 # Problem 4

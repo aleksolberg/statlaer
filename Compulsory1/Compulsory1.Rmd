@@ -174,7 +174,6 @@ mean(qda.predicted.classes == test$adelie)
 ```{r}
 library(class)
 knn.model <- knn(train = train, test = test, cl = train$adelie, k=25, prob = T)
-table(knn.model, test$adelie)
 mean(knn.model == test$adelie)
 ```
   (iv)
@@ -309,5 +308,5 @@ From the results of the bootstrap we see that a non-smoking male with a sbp=150 
 ## d)
 (i) False
 (ii) True
-(iii)
-(iv)
+(iii) False
+(iv) False

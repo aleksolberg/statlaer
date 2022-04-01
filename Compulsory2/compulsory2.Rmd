@@ -11,23 +11,31 @@ output:
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3,fig.align = "center")
+                      cache=TRUE, size="scriptsize",fig.width = 6, fig.height = 3, fig.align = "center")
 ```
 
 ```{r,eval=TRUE,echo=FALSE}
-# install.packages("knitr") #probably already installed
-# install.packages("rmarkdown") #probably already installed
-# install.packages("ggplot2") #plotting with ggplot
-# install.packages("palmerpenguins")
-# install.packages("ggfortify") # For model checking
-# install.packages("MASS")
-# install.packages("class")
-# install.packages("pROC")
-# install.packages("plotROC")
-# install.packages("boot")
+#install.packages("ggplot2")
+#install.packages("tidyverse")
+#install.packages("palmerpenguins")
+#install.packages("GGally")
+#install.packages("MASS")
+#install.packages("caret")
+#install.packages("leaps")
+#install.packages("glmnet")
+#install.packages("pls")
+#install.packages("gam")
+#install.packages("e1071")
+#install.packages("tree")
+#install.packages("randomForest")
+#install.packages("ggfortify")
 library("knitr")
 library("rmarkdown")
-library("palmerpenguins")
+library('MASS')
+library(leaps)
+library(ggplot2)
+library(GGally)
+library(glmnet)
 ```
 
 <!--  Etc (load all packages needed). -->
@@ -35,29 +43,67 @@ library("palmerpenguins")
 
 # Problem 1
 
-For this problem you will need to include some LaTex code. Please install latex on your computer and then consult Compulsor1.Rmd for hints how to write formulas in LaTex.
+```{r, eval=TRUE,echo=TRUE}
+set.seed(1)
+boston <- scale(Boston, center = T, scale =  T)
 
+train.ind = sample(1:nrow(boston), 0.8 * nrow(boston))
+boston.train = data.frame(boston[train.ind, ])
+boston.test = data.frame(boston[-train.ind, ])
+```
 ## a)
+```{r, eval=TRUE,echo=TRUE}
+set.seed(1)
+forward_stepwise = regsubsets(medv ~ ., data = boston.train, nvmax = 13, method = 'forward')
+backward_stepwise = regsubsets(medv ~ ., data = boston.train, nvmax = 13, method = 'backward')
+
+forward_stepwise_summary = summary(forward_stepwise)
+backward_stepwise_summary = summary(backward_stepwise)
+#forward_stepwise_summary
+#backward_stepwise_summary
+
+par(mfrow=c(1,2))
+plot(forward_stepwise_summary$adjr2, xlab = '# variables', ylab = 'Adjusted R^2', type='l', main='Forwards')
+plot(forward_stepwise_summary$adjr2, xlab = '# variables', ylab = 'Adjusted R^2', type='l', main='Backwards')
+
+```
+
 
 ## b)
+```{r, eval=TRUE,echo=TRUE}
+forward_stepwise_summary$outmat
+```
+We choose the predictors 'rm, 'dis', 'ptratio' and 'lstat'.
 
 ## c)
+### i)
+```{r, eval=TRUE,echo=TRUE}
+set.seed(1)
+y = boston.train$medv
+x = data.matrix(boston.train[, -14])
+
+cv_lasso = cv.glmnet(x, y, alpha=1, nfolds=5)
+plot(cv_lasso)
+```
+### ii)
+```{r, eval=TRUE,echo=TRUE}
+lasso_best_lambda = cv_lasso$lambda.min
+lasso_best_lambda
+```
+### iii)
+```{r}
+coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
+```
+
 
 ## d)
-
-## e)
-
+### i) TRUE
+### ii) FALSE
+### iii) FALSE
+### iv) TRUE
  
 
 # Problem 2
-
-Here is a code chunk:
-
-```{r, eval=TRUE}
-library(palmerpenguins) # Contains the data set "penguins".
-data(penguins)
-head(penguins)
-```
 
 
 ## a)

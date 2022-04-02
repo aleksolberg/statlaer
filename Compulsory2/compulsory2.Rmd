@@ -36,6 +36,7 @@ library(leaps)
 library(ggplot2)
 library(GGally)
 library(glmnet)
+library(gam)
 ```
 
 <!--  Etc (load all packages needed). -->
@@ -91,7 +92,7 @@ lasso_best_lambda = cv_lasso$lambda.min
 lasso_best_lambda
 ```
 ### iii)
-```{r}
+```{r, eval=TRUE,echo=TRUE}
 coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 ```
 
@@ -105,7 +106,6 @@ coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 
 # Problem 2
 
-
 ## a)
 
 ## b) 
@@ -114,5 +114,18 @@ coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 
 
 # Problem 3
+
+## a)
+### i) TRUE
+### ii) FALSE
+### iii) FALSE
+### iv) TRUE
+
+## b)
+```{r, eval=TRUE,echo=TRUE}
+additive_model = gam(medv ~ rm + s(ptratio, df=3) + poly(lstat, 2), data=boston.train)
+plot(additive_model)
+```
+
 
 # Problem 4

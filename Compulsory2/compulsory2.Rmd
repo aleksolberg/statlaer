@@ -29,6 +29,7 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.wh
 #install.packages("tree")
 #install.packages("randomForest")
 #install.packages("ggfortify")
+#install.packages('tikz')
 library("knitr")
 library("rmarkdown")
 library('MASS')
@@ -37,6 +38,7 @@ library(ggplot2)
 library(GGally)
 library(glmnet)
 library(gam)
+library(tikzDevice)
 ```
 
 <!--  Etc (load all packages needed). -->
@@ -108,9 +110,7 @@ coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 
 ## a)
 
-## b) 
- 
-## c)
+## b)
 
 
 # Problem 3
@@ -129,3 +129,15 @@ plot(additive_model)
 
 
 # Problem 4
+
+## a) 
+### i) FALSE
+### ii) TRUE
+### iii) TRUE
+### iv) TRUE
+
+## b)
+![Tree](Tree.png){width=200}
+
+## c)
+testest 

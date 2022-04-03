@@ -101,10 +101,7 @@ coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 
 
 ## d)
-### i) TRUE
-### ii) FALSE
-### iii) FALSE
-### iv) TRUE
+TRUE, FALSE, FALSE, TRUE
  
 
 # Problem 2
@@ -117,10 +114,7 @@ coef(glmnet(x, y, alpha=1, lambda=lasso_best_lambda))
 # Problem 3
 
 ## a)
-### i) TRUE
-### ii) FALSE
-### iii) FALSE
-### iv) TRUE
+TRUE, FALSE, FALSE, TRUE
 
 ## b)
 ```{r, fig.width=6, fig.height=3, eval=TRUE,echo=TRUE}
@@ -132,10 +126,7 @@ plot(additive_model)
 # Problem 4
 
 ## a) 
-### i) FALSE
-### ii) TRUE
-### iii) TRUE
-### iv) TRUE
+FALSE, TRUE, TRUE, TRUE
 
 ## b)
 ![Tree](Tree.png){width=200}
@@ -184,5 +175,18 @@ tree.predict = predict(prune.penguins, test, type='class')
 misclass = table(tree.predict, test$species)
 misclass
 1-sum(diag(misclass))/sum(misclass)
+```
+## d)
+
+
+# Problem 5
+
+## a)
+FALSE, FALSE, TRUE, TRUE
+
+## b)
+### i)
+```{r, eval=TRUE,echo=TRUE}
+
 ```
 

@@ -29,7 +29,8 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.wh
 #install.packages("tree")
 #install.packages("randomForest")
 #install.packages("ggfortify")
-#install.packages('tikz')
+#install.packages('gbm')
+#install.packages('tikzDevice')
 library("knitr")
 library("rmarkdown")
 library('MASS')
@@ -38,8 +39,9 @@ library(ggplot2)
 library(GGally)
 library(glmnet)
 library(gam)
-library(tikzDevice)
 library(tree)
+library(gbm)
+library(randomForest)
 ```
 
 <!--  Etc (load all packages needed). -->
@@ -117,7 +119,7 @@ TRUE, FALSE, FALSE, TRUE
 TRUE, FALSE, FALSE, TRUE
 
 ## b)
-```{r, fig.width=6, fig.height=3, eval=TRUE,echo=TRUE}
+```{r, fig.width=6, fig.height=3, out.width='70%', eval=TRUE,echo=TRUE}
 additive_model = gam(medv ~ rm + s(ptratio, df=3) + poly(lstat, 2), data=boston.train)
 plot(additive_model)
 ```
@@ -159,10 +161,10 @@ plot(penguin.tree, type='uniform')
 text(penguin.tree, pretty=0)
 ```
 ### ii)
-```{r, eval=TRUE,echo=TRUE}
+```{r, fig.width=6, fig.height=3, out.width='70%', eval=TRUE,echo=TRUE}
 set.seed(123)
 cv.penguins = cv.tree(penguin.tree, K=10)
-cv.penguins$dev
+#cv.penguins$dev
 plot(cv.penguins$dev ~ cv.penguins$size, type='b')
 ```
 ### iii)
@@ -177,16 +179,37 @@ misclass
 1-sum(diag(misclass))/sum(misclass)
 ```
 ## d)
+Using random forest. Trying different choices for variable mtry, and plotting the misclassification errors.
+```{r, fig.width=6, fig.height=3, out.width='70%', eval=TRUE,echo=TRUE}
+set.seed(1001)
 
+train.err = double(6)
+test.err = double(6)
+
+for(mtry in 1:6) {
+  rf.penguins = randomForest(species ~ ., data=train, mtry=mtry, ntree=500)
+  train.err[mtry] = rf.penguins$err.rate[500]
+
+  rf.predict = predict(rf.penguins, newdata=test, type='class')
+  misclass = table(rf.predict, test$species)
+  misclass
+  test.err[mtry] = 1-sum(diag(misclass))/sum(misclass)
+}
+
+matplot(1:mtry, cbind(test.err, train.err), pch=19, type='b', ylab='Missclassification error', col=c('red', 'blue'))
+legend('bottomright', legend=c('test', 'train'), pch=19, col=c('red','blue'))
+```
+We find that a good choice for mtry is 2, which also approximately corresponds to the square root of the number of covariates.
+```{r, eval=TRUE,echo=TRUE}
+rf.penguins = randomForest(species ~ ., data=train, mtry=2, ntree=500)
+
+rf.predict = predict(rf.penguins, newdata=test, type='class')
+misclass = table(rf.predict, test$species)
+misclass
+1-sum(diag(misclass))/sum(misclass)
+
+importance(rf.penguins)
+```
+We see that the two most influential variables are 'billL' and 'flipperL'.
 
 # Problem 5
-
-## a)
-FALSE, FALSE, TRUE, TRUE
-
-## b)
-### i)
-```{r, eval=TRUE,echo=TRUE}
-
-```
-

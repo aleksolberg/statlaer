@@ -42,6 +42,12 @@ library(gam)
 library(tree)
 library(gbm)
 library(randomForest)
+library(tikzDevice)
+library(ISLR)
+library(dplyr)
+library(tidyr)
+library(pls)
+library(e1071)
 ```
 
 <!--  Etc (load all packages needed). -->
@@ -108,9 +114,52 @@ TRUE, FALSE, FALSE, TRUE
 
 # Problem 2
 
+```{r, eval=TRUE, echo=TRUE}
+library(MASS)
+set.seed(1)
+
+# load a synthetic dataset
+id <- "1CWZYfrLOrFdrIZ6Hv73e3xxt0SFgU4Ph" # google file ID
+synthetic <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+
+# split into training and test sets
+train.ind = sample(1:nrow(synthetic), 0.8 * nrow(synthetic)) 
+synthetic.train = data.frame(synthetic[train.ind, ])
+synthetic.test = data.frame(synthetic[-train.ind, ])
+
+# show head(..)
+# Y: response variable; X: predictor variable
+#head(synthetic)
+```
+
+
 ## a)
 
+```{r, eval=TRUE,echo=TRUE}
+pcr_fit <- pcr(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
+plsr_fit <- plsr(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
+
+#summary(plsr_fit)
+
+validationplot(pcr_fit, val.type = "MSEP", main = "PCR")
+validationplot(plsr_fit, val.type = "MSEP", main = "PLSR")
+
+```
+
 ## b)
+We see that the mean squared error of prediction is is lower for PLSR compared to PCR for number of components < 10, which is to be expected since PLSR takes the response, Y, into account when fitting the model.
+
+If we look at a regular linear regression model we see from the p-values of X4, X5, X6, X7, X8, X9 and X10 that they don't have a significant relationship with Y.
+This explains why PLSR reaches close to its minimum at 4 components, since X4 to X10 do little to effect to response.
+
+For PCR the MSEP decreases for each additional component, since the predictors are not seen in relation to the response.
+
+
+```{r, eval=TRUE,echo=TRUE}
+pcr_lm <- lm(Y~., data = synthetic.train, scale = TRUE, validation = "CV")
+summary(pcr_lm)
+```
+
 
 
 # Problem 3
@@ -213,3 +262,143 @@ importance(rf.penguins)
 We see that the two most influential variables are 'billL' and 'flipperL'.
 
 # Problem 5
+
+## a)
+FALSE, FALSE, TRUE, TRUE
+
+## b)
+### i)
+```{r, eval=TRUE,echo=TRUE}
+# Setting training and test data into data frame
+svm.train = data.frame(x=train[,2:7], y = train[,1])
+svm.test = data.frame(x=test[,2:7], y = test[,1])
+
+# Support vector classifier
+svm.linear <- svm(species ~ ., data = svm.train, type = "C-classification", kernel = "linear", scale = FALSE, cost = 1)
+#summary(svm.linear)
+
+# Cross-validation of support vector classifier
+CV.linear <- tune(svm, species~., data = svm.train, kernel = "linear", ranges=list(cost=c(0.001,0.01,0.1,1,5,10,100)))
+#summary(CV.linear)
+
+best.linear = CV.linear$best.model
+#summary(best.linear)
+
+svm.radial <- svm(species ~ ., data = svm.train, type = "C-classification", kernel = "radial", scale = FALSE, cost = 10000000, gamma = 0.0000001)
+#summary(svm.radial)
+
+CV.radial <- tune(svm, species~., data = svm.train, scale = FALSE, kernel = "radial", ranges=list(cost=c(0.001,0.01,0.1,1,5,10,100, 1000, 10000, 100000, 1000000, 10000000), gamma=c(0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.001,0.01,0.1,1,5,10,100)))
+#summary(CV.radial)
+
+best.radial = CV.radial$best.model
+#summary(best.radial)
+```
+We see that the for the linear boundary the optimal cost parameter is 0.1, which gives an error of 0.004347826. For the radial boundary the best cost and gamma parameters are 1e06 and 1e-07 respectively, which gives an error of 0.008514493.
+
+### ii)
+
+```{r, eval=TRUE,echo=TRUE}
+# Confusion tables
+pred.linear = predict(best.linear, svm.test)
+table(predict=pred.linear, truth=svm.test[,7])
+
+pred.radial = predict(best.radial, svm.test)
+table(predict=pred.radial, truth=svm.test[,7])
+
+```
+From the confusion tables above we see that the misclassification error of the support vector classifier is 0. The error rate of the support vector machine is 0.01.
+
+### iii)
+
+The high cost in the support vector machine implies a low tuning parameter, C. This could mean that our model is underfitted. The low value of gamma in the support vector machine indicates that the model may be too constrained.
+
+With these factors in mind we prefer the support vector classifier, which has both a lower training and test error.
+
+
+
+# Problem 6
+
+## a)
+### i) 
+We can see that the features 'Logged.GDP.per.capita', 'Social.support' and 'Healthy.life.expectancy' all point in the same direction, suggesting that these are corrolated. We also see that 'Freedom.to.make.life.choices' and 'Perceptions.of.corruption' point in opposite directions, meaning they are negatively corrolated, i.e. a country with high perceptions of corruption will have lower freedom to make life choices.
+
+### ii) 
+Afghanistan can be considered an outlier
+
+## b)
+```{r}
+# load a synthetic dataset
+id <- "1NJ1SuUBebl5P8rMSIwm_n3S8a7K43yP4" # google file ID
+happiness <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id),fileEncoding="UTF-8-BOM")
+#colnames(happiness)
+cols = c('Country.name', 
+         'Ladder.score',  # happiness score
+         'Logged.GDP.per.capita',  
+         'Social.support', 
+         'Healthy.life.expectancy', 
+         'Freedom.to.make.life.choices',
+         'Generosity',  # how generous people are
+         'Perceptions.of.corruption')
+# We continue with a subset of 8 columns:
+happiness = subset(happiness, select = cols)
+rownames(happiness) <- happiness[, c(1)]
+# And we creat an X and a Y matrix
+happiness.X = happiness[, -c(1, 2)]
+happiness.Y = happiness[, c(1, 2)]
+happiness.XY = happiness[, -c(1)]
+# scale
+happiness.X = data.frame(scale(happiness.X))
+#str(happiness)
+```
+
+
+```{r, fig.height=9, fig.width=10,out.width='18cm'}
+library(ggfortify)
+pca_mat = prcomp(happiness.X, center=T, scale=T)
+# Score and loadings plot:
+#autoplot(pca_mat, data = happiness.X, colour='Black',
+#         loadings = TRUE, loadings.colour = 'red',
+#         loadings.label = TRUE, loadings.label.size = 5, 
+#         label=T, label.size=4.5)
+```
+
+### i) 
+```{r, fig.heigth = 3, out.width='70%', eval=TRUE,echo=TRUE}
+par(mar=c(13,3,1,1))
+barplot(abs(data.frame(pca_mat$rotation)$PC1), names.arg=cols[-c(1,2)], las=2, cex.names=0.7)
+```
+### ii)
+```{r, eval=TRUE,echo=TRUE}
+?plsr()
+plsr_model = plsr(Ladder.score ~ ., data=happiness.XY, scale=TRUE)
+summary(plsr_model)
+```
+### iii)
+```{r, fig.heigth = 3, out.width='70%', eval=TRUE,echo=TRUE}
+par(mar=c(13,3,1,1))
+barplot(abs(plsr_model$loadings[, c('Comp 1')]), las=2, cex.names=0.7)
+```
+### iv)
+The three most important predictors are 'Logged.GDP.per.capita', 'Social.support', and 'Healthy.life.expectancy'.
+
+## c) 
+FALSE, FALSE, TRUE, TRUE
+
+## d) 
+
+### i)
+```{r, fig.height=10, fig.width=10, eval=F}
+set.seed(123)
+K = 4  # your choice
+km.out = kmeans(happiness.X, K)
+autoplot(pca_mat, data = happiness.X, colour=km.out$cluster,
+         label=T, label.size=5,
+         loadings = F, loadings.colour = 'blue',
+         loadings.label = F, loadings.label.size = 3)
+```
+
+### ii)
+
+Interpretation 1: Countries within a cluster have happiness scores similar to eachother.
+
+Interpretation 2: 
